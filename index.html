@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PlaceTrack — Placement Management Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#12172B;--bg2:#1A2035;--bg3:#222840;--bg4:#2A3150;
+  --accent:#4F8EF7;--accent2:#3A6FD8;--success:#1D9E75;--warn:#EF9F27;--danger:#E24B4A;
+  --txt:#E8EAF0;--txt2:#9BA3BC;--txt3:#5C6480;
+  --border:#2A3150;--border2:#3A4460;
+  --card-r:12px
+}
+html,body{height:100%;font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--txt);font-size:14px}
+
+/* ── SCREEN SWITCHER ── */
+.screen{display:none;min-height:100vh}
+.screen.active{display:flex}
+
+/* ── LOGIN ── */
+#login-screen{align-items:stretch;min-height:100vh}
+.login-left{flex:1;background:var(--bg2);display:flex;flex-direction:column;justify-content:center;padding:3rem 2.5rem;border-right:1px solid var(--border)}
+.login-right{flex:1;display:flex;flex-direction:column;justify-content:center;padding:3rem 2.5rem;max-width:480px;margin:0 auto;width:100%}
+.brand-mark{width:40px;height:40px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:1.5rem}
+.brand-mark svg{width:22px;height:22px}
+.login-tagline{font-size:24px;font-weight:500;line-height:1.4;color:var(--txt);margin-bottom:.5rem}
+.login-sub{font-size:14px;color:var(--txt2);line-height:1.7;margin-bottom:2.5rem}
+.stat-row{display:flex;gap:2rem;margin-top:auto;padding-top:2rem;border-top:1px solid var(--border)}
+.stat-mini .n{font-size:22px;font-weight:500;color:var(--accent)}
+.stat-mini .l{font-size:12px;color:var(--txt3);margin-top:3px}
+.login-form-title{font-size:20px;font-weight:500;margin-bottom:.25rem}
+.login-form-sub{font-size:13px;color:var(--txt2);margin-bottom:2rem}
+.role-toggle{display:flex;gap:8px;margin-bottom:1.5rem}
+.role-btn{flex:1;padding:.55rem;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--txt2);font-size:13px;cursor:pointer;transition:all .15s;text-align:center;font-family:inherit}
+.role-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:500}
+.field-group{margin-bottom:1rem}
+.field-label{font-size:12px;color:var(--txt2);margin-bottom:.4rem;display:block;font-weight:500;letter-spacing:.02em}
+.field-input{width:100%;padding:.65rem .875rem;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--txt);font-size:14px;outline:none;transition:border-color .15s;font-family:inherit}
+.field-input:focus{border-color:var(--accent);background:var(--bg4)}
+.field-input::placeholder{color:var(--txt3)}
+.forgot{font-size:12px;color:var(--txt3);text-align:right;margin-top:.5rem;cursor:pointer;transition:color .15s}
+.forgot:hover{color:var(--accent)}
+.login-btn{width:100%;padding:.75rem;background:var(--accent);border:none;border-radius:8px;color:#fff;font-size:14px;font-weight:500;cursor:pointer;transition:background .15s;font-family:inherit;margin-top:1.25rem}
+.login-btn:hover{background:var(--accent2)}
+
+/* ── DASHBOARD LAYOUT ── */
+#dash-screen{flex-direction:row;min-height:100vh}
+.sidebar{width:220px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:1.25rem 0;flex-shrink:0;min-height:100vh}
+.sidebar-brand{display:flex;align-items:center;gap:9px;padding:0 1.25rem 1.5rem;border-bottom:1px solid var(--border);margin-bottom:.75rem}
+.sidebar-logo{width:30px;height:30px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sidebar-name{font-size:15px;font-weight:500}
+.nav-section{font-size:10px;text-transform:uppercase;letter-spacing:.09em;color:var(--txt3);padding:.25rem 1.25rem .5rem;margin-top:.25rem}
+.nav-item{display:flex;align-items:center;gap:10px;padding:.6rem 1.25rem;cursor:pointer;color:var(--txt2);font-size:13px;border-left:3px solid transparent;transition:all .15s}
+.nav-item:hover{color:var(--txt);background:rgba(255,255,255,.04)}
+.nav-item.active{color:var(--accent);background:rgba(79,142,247,.08);border-left-color:var(--accent)}
+.nav-icon{width:16px;height:16px;flex-shrink:0;opacity:.65}
+.nav-item.active .nav-icon{opacity:1}
+.nav-badge{margin-left:auto;background:var(--danger);color:#fff;font-size:10px;padding:1px 6px;border-radius:10px;font-weight:500}
+.sidebar-footer{margin-top:auto;padding:1rem 1.25rem;border-top:1px solid var(--border)}
+.user-pill{display:flex;align-items:center;gap:9px}
+.avatar{width:32px;height:32px;border-radius:50%;background:var(--accent2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;flex-shrink:0}
+.user-name{font-size:13px;font-weight:500}
+.user-role{font-size:11px;color:var(--txt3);margin-top:1px}
+
+/* ── MAIN AREA ── */
+.main{flex:1;display:flex;flex-direction:column;min-height:100vh;overflow-y:auto}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:.875rem 1.5rem;border-bottom:1px solid var(--border);background:var(--bg);position:sticky;top:0;z-index:10}
+.topbar-title{font-size:15px;font-weight:500}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.search-box{display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:.4rem .75rem}
+.search-box input{background:none;border:none;outline:none;color:var(--txt);font-size:13px;width:150px;font-family:inherit}
+.search-box input::placeholder{color:var(--txt3)}
+.icon-btn{width:34px;height:34px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;transition:background .15s}
+.icon-btn:hover{background:var(--bg4)}
+.notif-dot::after{content:'';width:6px;height:6px;background:var(--danger);border-radius:50%;position:absolute;top:5px;right:5px;border:1.5px solid var(--bg)}
+.main-content{padding:1.5rem;flex:1}
+
+/* ── VIEWS ── */
+.view{display:none}
+.view.active{display:block}
+
+/* ── DASHBOARD VIEW ── */
+.welcome-row{margin-bottom:1.5rem}
+.welcome-txt{font-size:22px;font-weight:500}
+.welcome-sub{font-size:13px;color:var(--txt2);margin-top:4px}
+.kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:1.75rem}
+.kpi-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--card-r);padding:1.1rem 1.25rem;cursor:pointer;transition:border-color .15s,transform .15s}
+.kpi-card:hover{border-color:var(--border2);transform:translateY(-1px)}
+.kpi-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:.625rem}
+.kpi-label{font-size:12px;color:var(--txt2);font-weight:500}
+.kpi-icon{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center}
+.kpi-num{font-size:28px;font-weight:500;line-height:1;letter-spacing:-.5px}
+.kpi-sub{font-size:11px;margin-top:5px;color:var(--txt3)}
+.kpi-up{color:var(--success)}
+.kpi-warn{color:var(--warn)}
+.section-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:.875rem}
+.section-title{font-size:14px;font-weight:500}
+.see-all{font-size:12px;color:var(--accent);cursor:pointer;transition:opacity .15s}
+.see-all:hover{opacity:.8}
+.activity-list{background:var(--bg2);border:1px solid var(--border);border-radius:var(--card-r);overflow:hidden}
+.act-item{display:flex;align-items:center;gap:12px;padding:.8rem 1.1rem;border-bottom:1px solid var(--border);transition:background .15s}
+.act-item:last-child{border-bottom:none}
+.act-item:hover{background:rgba(255,255,255,.02)}
+.act-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.act-dot.blue{background:var(--accent)}
+.act-dot.green{background:var(--success)}
+.act-dot.warn{background:var(--warn)}
+.act-dot.red{background:var(--danger)}
+.act-txt{flex:1;font-size:13px;line-height:1.5}
+.act-time{font-size:11px;color:var(--txt3);white-space:nowrap}
+
+/* ── BADGES ── */
+.badge{display:inline-block;font-size:11px;padding:2px 9px;border-radius:10px;font-weight:500;margin-left:6px}
+.badge-applied{background:rgba(79,142,247,.15);color:#7BB0FA}
+.badge-interview{background:rgba(239,159,39,.15);color:#EF9F27}
+.badge-offer{background:rgba(29,158,117,.15);color:#2DC99A}
+.badge-rejected{background:rgba(226,75,74,.15);color:#E87877}
+
+/* ── APPLICATIONS VIEW ── */
+.filter-row{display:flex;gap:8px;margin-bottom:1.1rem;flex-wrap:wrap}
+.filter-chip{padding:.35rem .875rem;border-radius:20px;border:1px solid var(--border2);font-size:12px;cursor:pointer;color:var(--txt2);transition:all .15s;background:var(--bg3);font-family:inherit;font-weight:500}
+.filter-chip:hover{border-color:var(--accent);color:var(--txt)}
+.filter-chip.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.data-table{width:100%;border-collapse:collapse;background:var(--bg2);border-radius:var(--card-r);overflow:hidden;border:1px solid var(--border)}
+.data-table th{padding:.65rem 1.1rem;text-align:left;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--txt3);border-bottom:1px solid var(--border);background:var(--bg3)}
+.data-table td{padding:.7rem 1.1rem;font-size:13px;border-bottom:1px solid var(--border)}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tbody tr:hover td{background:rgba(255,255,255,.02)}
+.company-cell{display:flex;align-items:center;gap:9px}
+.co-logo{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;flex-shrink:0}
+
+/* ── PROFILE VIEW ── */
+.profile-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--card-r);padding:1.5rem;margin-bottom:1rem}
+.profile-header{display:flex;align-items:center;gap:1.1rem;margin-bottom:1.5rem}
+.profile-avatar{width:58px;height:58px;border-radius:50%;background:var(--accent2);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:500;color:#fff;flex-shrink:0}
+.profile-name{font-size:18px;font-weight:500}
+.profile-meta{font-size:13px;color:var(--txt2);margin-top:3px}
+.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.1rem}
+.profile-field label{font-size:11px;color:var(--txt3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.3rem;display:block;font-weight:600}
+.profile-field p{font-size:13px}
+.skill-pills{display:flex;flex-wrap:wrap;gap:7px;margin-top:.6rem}
+.skill-pill{padding:.3rem .75rem;background:rgba(79,142,247,.12);color:#7BB0FA;border-radius:20px;font-size:12px;font-weight:500}
+.prog-bar-wrap{margin-bottom:.875rem}
+.prog-label{display:flex;justify-content:space-between;font-size:12px;margin-bottom:.35rem;color:var(--txt2)}
+.prog-bar{height:5px;background:var(--bg4);border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;border-radius:3px}
+
+/* ── RESPONSIVE ── */
+@media(max-width:640px){
+  #login-screen{flex-direction:column}
+  .login-left{padding:2rem 1.5rem;flex:none}
+  .stat-row{display:none}
+  #dash-screen{flex-direction:column}
+  .sidebar{width:100%;min-height:auto;flex-direction:row;flex-wrap:wrap;padding:.75rem}
+  .sidebar-brand{border:none;margin:0;padding:0 1rem 0 0}
+  .nav-section{display:none}
+  .kpi-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen" class="screen active">
+  <div class="login-left">
+    <div class="brand-mark">
+      <svg viewBox="0 0 22 22" fill="none"><path d="M4 11l5 5L18 6" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="login-tagline">Track every opportunity.<br>Land the right role.</div>
+    <div class="login-sub">PlaceTrack helps students manage job applications, interview stages, and offer decisions — all in one dashboard.</div>
+    <div class="stat-row">
+      <div class="stat-mini"><div class="n">1,240+</div><div class="l">Students placed</div></div>
+      <div class="stat-mini"><div class="n">340+</div><div class="l">Partner companies</div></div>
+      <div class="stat-mini"><div class="n">92%</div><div class="l">Offer rate</div></div>
+    </div>
+  </div>
+  <div class="login-right">
+    <div class="login-form-title">Welcome back</div>
+    <div class="login-form-sub">Sign in to your account to continue</div>
+    <div class="role-toggle">
+      <button class="role-btn active" id="btn-student" onclick="setRole('student')">Student</button>
+      <button class="role-btn" id="btn-admin" onclick="setRole('admin')">Admin</button>
+    </div>
+    <div class="field-group">
+      <label class="field-label">Email address</label>
+      <input class="field-input" type="email" placeholder="adhithya@example.com">
+    </div>
+    <div class="field-group">
+      <label class="field-label">Password</label>
+      <input class="field-input" type="password" placeholder="Enter your password">
+      <div class="forgot">Forgot password?</div>
+    </div>
+    <button class="login-btn" onclick="goToDash()">Sign in to PlaceTrack</button>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dash-screen" class="screen">
+  <div class="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-logo">
+        <svg width="16" height="16" viewBox="0 0 22 22" fill="none"><path d="M4 11l5 5L18 6" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="sidebar-name">PlaceTrack</div>
+    </div>
+    <div class="nav-section">Main</div>
+    <div class="nav-item active" onclick="showView('dashboard',this)">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="1" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/><rect x="1" y="9" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="9" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/></svg>
+      Dashboard
+    </div>
+    <div class="nav-item" onclick="showView('applications',this)">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M2 3h12M2 8h8M2 13h6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      Applications
+      <span class="nav-badge">3</span>
+    </div>
+    <div class="nav-item" onclick="showView('profile',this)">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5.5" r="3" stroke="currentColor" stroke-width="1.3"/><path d="M2 14.5c0-3 2.7-5 6-5s6 2 6 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      My profile
+    </div>
+    <div class="sidebar-footer">
+      <div class="user-pill">
+        <div class="avatar">AB</div>
+        <div>
+          <div class="user-name">Adhithya Babu</div>
+          <div class="user-role" id="role-label">Student</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="page-title">Dashboard</div>
+      <div class="topbar-right">
+        <div class="search-box">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5" stroke="var(--txt3)" stroke-width="1.5"/><path d="M11 11l3 3" stroke="var(--txt3)" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <input placeholder="Search applications…">
+        </div>
+        <div class="icon-btn notif-dot">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 1.5a5 5 0 015 5v3l1.5 2H1.5L3 9.5v-3a5 5 0 015-5z" stroke="var(--txt2)" stroke-width="1.2"/><path d="M6.5 13.5a1.5 1.5 0 003 0" stroke="var(--txt2)" stroke-width="1.2" stroke-linecap="round"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="main-content">
+
+      <!-- DASHBOARD -->
+      <div class="view active" id="view-dashboard">
+        <div class="welcome-row">
+          <div class="welcome-txt">Welcome back, Adhithya</div>
+          <div class="welcome-sub">Here's your placement activity at a glance</div>
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi-card" onclick="showView('applications',document.querySelectorAll('.nav-item')[1])">
+            <div class="kpi-top">
+              <div class="kpi-label">Total applications</div>
+              <div class="kpi-icon" style="background:rgba(79,142,247,.15)">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 3h12M2 8h8M2 13h6" stroke="#4F8EF7" stroke-width="1.4" stroke-linecap="round"/></svg>
+              </div>
+            </div>
+            <div class="kpi-num">12</div>
+            <div class="kpi-sub kpi-up">+3 this week</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-top">
+              <div class="kpi-label">Interviews scheduled</div>
+              <div class="kpi-icon" style="background:rgba(239,159,39,.15)">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="2" stroke="#EF9F27" stroke-width="1.4"/><path d="M5 1v4M11 1v4M2 7h12" stroke="#EF9F27" stroke-width="1.4" stroke-linecap="round"/></svg>
+              </div>
+            </div>
+            <div class="kpi-num">3</div>
+            <div class="kpi-sub kpi-warn">Next: Tomorrow 10am</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-top">
+              <div class="kpi-label">Offers received</div>
+              <div class="kpi-icon" style="background:rgba(29,158,117,.15)">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-7" stroke="#1D9E75" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+            </div>
+            <div class="kpi-num">1</div>
+            <div class="kpi-sub kpi-up">Respond by Jun 10</div>
+          </div>
+        </div>
+        <div class="section-hd">
+          <div class="section-title">Recent activity</div>
+          <div class="see-all" onclick="showView('applications',document.querySelectorAll('.nav-item')[1])">See all →</div>
+        </div>
+        <div class="activity-list">
+          <div class="act-item">
+            <div class="act-dot green"></div>
+            <div class="act-txt">Offer received from <strong>CogniCor Technologies</strong> <span class="badge badge-offer">Offer</span></div>
+            <div class="act-time">2h ago</div>
+          </div>
+          <div class="act-item">
+            <div class="act-dot warn"></div>
+            <div class="act-txt">Interview scheduled with <strong>Luminar Solutions</strong> <span class="badge badge-interview">Interview</span></div>
+            <div class="act-time">Yesterday</div>
+          </div>
+          <div class="act-item">
+            <div class="act-dot blue"></div>
+            <div class="act-txt">Applied to <strong>Infosys</strong> — Full Stack Developer <span class="badge badge-applied">Applied</span></div>
+            <div class="act-time">2 days ago</div>
+          </div>
+          <div class="act-item">
+            <div class="act-dot red"></div>
+            <div class="act-txt">Application update from <strong>TCS</strong> <span class="badge badge-rejected">Not selected</span></div>
+            <div class="act-time">3 days ago</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- APPLICATIONS -->
+      <div class="view" id="view-applications">
+        <div class="filter-row">
+          <button class="filter-chip active" onclick="filterApps('All',this)">All (12)</button>
+          <button class="filter-chip" onclick="filterApps('Applied',this)">Applied</button>
+          <button class="filter-chip" onclick="filterApps('Interview',this)">Interview</button>
+          <button class="filter-chip" onclick="filterApps('Offer',this)">Offer</button>
+          <button class="filter-chip" onclick="filterApps('Not selected',this)">Not selected</button>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Company</th>
+              <th>Role</th>
+              <th>Applied</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="apps-tbody"></tbody>
+        </table>
+      </div>
+
+      <!-- PROFILE -->
+      <div class="view" id="view-profile">
+        <div class="profile-card">
+          <div class="profile-header">
+            <div class="profile-avatar">AB</div>
+            <div>
+              <div class="profile-name">Adhithya Babu</div>
+              <div class="profile-meta">Computer Science &amp; Engineering · Batch 2025</div>
+            </div>
+          </div>
+          <div class="profile-grid">
+            <div class="profile-field"><label>Email</label><p>adhithyababu003@gmail.com</p></div>
+            <div class="profile-field"><label>Phone</label><p>+91 90745 10497</p></div>
+            <div class="profile-field"><label>CGPA</label><p>7.8 / 10</p></div>
+            <div class="profile-field"><label>Location</label><p>Palakkad, Kerala</p></div>
+          </div>
+        </div>
+        <div class="profile-card">
+          <div class="section-title" style="margin-bottom:.875rem">Skills</div>
+          <div class="skill-pills">
+            <span class="skill-pill">React.js</span>
+            <span class="skill-pill">Node.js</span>
+            <span class="skill-pill">MongoDB</span>
+            <span class="skill-pill">Python</span>
+            <span class="skill-pill">Flask</span>
+            <span class="skill-pill">REST APIs</span>
+            <span class="skill-pill">JWT Auth</span>
+            <span class="skill-pill">Git</span>
+            <span class="skill-pill">Figma</span>
+          </div>
+        </div>
+        <div class="profile-card">
+          <div class="section-title" style="margin-bottom:1rem">Application progress</div>
+          <div class="prog-bar-wrap">
+            <div class="prog-label"><span>Profile completion</span><span style="color:var(--success)">85%</span></div>
+            <div class="prog-bar"><div class="prog-fill" style="width:85%;background:var(--success)"></div></div>
+          </div>
+          <div class="prog-bar-wrap">
+            <div class="prog-label"><span>Applications submitted</span><span style="color:var(--accent)">12 / 20 target</span></div>
+            <div class="prog-bar"><div class="prog-fill" style="width:60%;background:var(--accent)"></div></div>
+          </div>
+          <div class="prog-bar-wrap">
+            <div class="prog-label"><span>Interview conversion rate</span><span style="color:var(--warn)">25%</span></div>
+            <div class="prog-bar"><div class="prog-fill" style="width:25%;background:var(--warn)"></div></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+var currentRole = 'student';
+
+function setRole(r) {
+  currentRole = r;
+  document.getElementById('btn-student').className = 'role-btn' + (r === 'student' ? ' active' : '');
+  document.getElementById('btn-admin').className = 'role-btn' + (r === 'admin' ? ' active' : '');
+}
+
+function goToDash() {
+  document.getElementById('login-screen').classList.remove('active');
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('dash-screen').className = 'screen active';
+  document.getElementById('role-label').textContent = currentRole === 'admin' ? 'Admin' : 'Student';
+}
+
+var apps = [
+  {co:'CogniCor',role:'UI/UX Design Intern',date:'May 18',status:'Offer',color:'#4F8EF7',initials:'CO'},
+  {co:'Luminar Solutions',role:'Frontend Developer',date:'May 15',status:'Interview',color:'#EF9F27',initials:'LS'},
+  {co:'Infosys',role:'Full Stack Developer',date:'May 14',status:'Applied',color:'#1D9E75',initials:'IN'},
+  {co:'Wipro',role:'React Developer',date:'May 12',status:'Applied',color:'#7F77DD',initials:'WI'},
+  {co:'TCS',role:'Software Engineer',date:'May 10',status:'Not selected',color:'#D85A30',initials:'TC'},
+  {co:'Zoho',role:'Backend Developer',date:'May 8',status:'Interview',color:'#EF9F27',initials:'ZO'},
+  {co:'Freshworks',role:'SDE Intern',date:'May 6',status:'Applied',color:'#1D9E75',initials:'FR'},
+  {co:'Postman',role:'Frontend Intern',date:'May 4',status:'Applied',color:'#4F8EF7',initials:'PM'},
+  {co:'Razorpay',role:'React Developer',date:'May 2',status:'Interview',color:'#7F77DD',initials:'RP'},
+  {co:'Swiggy',role:'Full Stack Dev',date:'Apr 29',status:'Applied',color:'#EF9F27',initials:'SW'},
+  {co:'BYJU\'S',role:'Frontend Developer',date:'Apr 26',status:'Not selected',color:'#D85A30',initials:'BY'},
+  {co:'Ola',role:'Node.js Developer',date:'Apr 22',status:'Applied',color:'#1D9E75',initials:'OL'},
+];
+
+var badgeMap = {
+  'Applied':'badge-applied',
+  'Interview':'badge-interview',
+  'Offer':'badge-offer',
+  'Not selected':'badge-rejected'
+};
+
+function renderApps(filter) {
+  var rows = apps.filter(function(a){ return filter === 'All' || a.status === filter; });
+  document.getElementById('apps-tbody').innerHTML = rows.map(function(a) {
+    return '<tr>' +
+      '<td><div class="company-cell"><div class="co-logo" style="background:' + a.color + '22;color:' + a.color + '">' + a.initials + '</div>' + a.co + '</div></td>' +
+      '<td style="color:var(--txt2)">' + a.role + '</td>' +
+      '<td style="color:var(--txt3)">' + a.date + '</td>' +
+      '<td><span class="badge ' + badgeMap[a.status] + '">' + a.status + '</span></td>' +
+    '</tr>';
+  }).join('');
+}
+
+function filterApps(f, el) {
+  document.querySelectorAll('.filter-chip').forEach(function(c){ c.classList.remove('active'); });
+  el.classList.add('active');
+  renderApps(f);
+}
+
+function showView(name, navEl) {
+  document.querySelectorAll('.view').forEach(function(v){ v.classList.remove('active'); });
+  document.getElementById('view-' + name).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('active'); });
+  if(navEl) navEl.classList.add('active');
+  var titles = {dashboard:'Dashboard', applications:'Applications', profile:'My profile'};
+  document.getElementById('page-title').textContent = titles[name] || name;
+}
+
+renderApps('All');
+</script>
+</body>
+</html>
