@@ -2,7 +2,7 @@
 
 A UI/UX design case study and interactive prototype built to demonstrate end-to-end product design skills — from identifying usability problems to delivering a high-fidelity, interactive solution.
 
-🔗 **[Live Demo](https://YOUR-USERNAME.github.io/placement-portal-ux)**
+🔗 **[Live Demo](https://adhithyababu.github.io/placement-portal-ux)**
 
 ---
 
